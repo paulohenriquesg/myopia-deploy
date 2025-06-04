@@ -38,6 +38,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: |
-          docker buildx build --platform linux/amd64 --tag ghcr.io/${{ github.repository_owner }}/myopia:${{ github.event.inputs.tag_version }} --push ./private-repo
+      - name: Build and push Docker image with multiple tags
+        uses: docker/build-push-action@v4
+        with:
+          context: ./private-repo
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/myopia:${{ github.event.inputs.tag_version }}
+            ghcr.io/${{ github.repository_owner }}/myopia:latest
