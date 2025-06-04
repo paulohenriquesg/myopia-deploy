@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag_version:
-        description: 'Tag version for the image'
+        description: 'Tag/Branch version for the image'
         required: true
         default: 'main'
 
@@ -16,13 +16,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Clone private repository with specific tag
+      - name: Clone private repository with specific tag or branch
         run: |
           git clone https://${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository_owner }}/myopia.git private-repo
           cd private-repo
-          git checkout tags/${{ github.event.inputs.tag_version }} -b build-branch || {
-            echo "::error::Tag ${{ github.event.inputs.tag_version }} not found in repository"
-            exit 1
+          
+          # First try to checkout as a tag
+          git checkout tags/${{ github.event.inputs.tag_version }} -b build-branch 2>/dev/null || {
+            # If tag checkout fails, try as a branch name
+            git checkout ${{ github.event.inputs.tag_version }} -b build-branch 2>/dev/null || {
+              echo "::error::Neither tag nor branch '${{ github.event.inputs.tag_version }}' found in repository"
+              exit 1
+            }
           }
 
       - name: Log in to GitHub Container Registry
