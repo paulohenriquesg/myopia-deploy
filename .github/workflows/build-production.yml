@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Docker Images
 
 on:
   workflow_dispatch:
@@ -40,13 +40,24 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push API Docker image
         uses: docker/build-push-action@v4
         with:
           context: ./private-repo
-          file: ./private-repo/production.Dockerfile
+          file: ./private-repo/production.api.Dockerfile
           push: true
           tags: |
-            ghcr.io/paulohenriquesg/myopia:${{ github.event.inputs.tag_version }}
-            ghcr.io/paulohenriquesg/myopia:latest
+            ghcr.io/paulohenriquesg/myopia-api:${{ github.event.inputs.tag_version }}
+            ghcr.io/paulohenriquesg/myopia-api:latest
+          platforms: linux/amd64
+
+      - name: Build and push Worker Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./private-repo
+          file: ./private-repo/production.worker.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/paulohenriquesg/myopia-worker-worker:${{ github.event.inputs.tag_version }}
+            ghcr.io/paulohenriquesg/myopia-worker-worker:latest
           platforms: linux/amd64
