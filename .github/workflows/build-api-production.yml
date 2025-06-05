@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build and Push API Docker Image
 
 on:
   workflow_dispatch:
@@ -49,15 +49,4 @@ jobs:
           tags: |
             ghcr.io/paulohenriquesg/myopia-api:${{ github.event.inputs.tag_version }}
             ghcr.io/paulohenriquesg/myopia-api:latest
-          platforms: linux/amd64
-
-      - name: Build and push Worker Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./private-repo
-          file: ./private-repo/production.worker.Dockerfile
-          push: true
-          tags: |
-            ghcr.io/paulohenriquesg/myopia-worker-worker:${{ github.event.inputs.tag_version }}
-            ghcr.io/paulohenriquesg/myopia-worker-worker:latest
           platforms: linux/amd64
